@@ -40,12 +40,12 @@ architecture Behavioral of alu_tbench is
 component alu is
         Port ( A : in  STD_LOGIC_VECTOR (1 downto 0);
                B : in  STD_LOGIC_VECTOR (1 downto 0);
-               S : in  STD_LOGIC_VECTOR (4 downto 0);
+               S : in  STD_LOGIC_VECTOR (3 downto 0);
                Y : out STD_LOGIC_VECTOR (3 downto 0));
 end component;
 
 signal A, B : STD_LOGIC_VECTOR (1 downto 0);
-signal S : STD_LOGIC_VECTOR(4 downto 0);
+signal S : STD_LOGIC_VECTOR(3 downto 0);
 signal Y : STD_LOGIC_VECTOR (3 downto 0);
 signal expected : STD_LOGIC_VECTOR(3 downto 0);
 
@@ -57,27 +57,26 @@ stim_proc : process
 begin
     -- testing sum
     wait for 200 ns;
-        S <= "00001";
+        S <= "0001";
         A <= "00";
         B <= "00";
         expected <= "0000";
     wait for 100 ns;
-        A <= "11";
+        A <= "01";
+        B <= "01";
+        expected <= "0010";
+    wait for 100 ns;
+        A <= "10";
         B <= "11";
-        expected <= "0110";
+        expected <= "1101";
     wait for 100 ns;
         A <= "10";
         B <= "01";
-        expected <= "0011";
-    wait for 100 ns;
-        S <= "00000";
-        A <= "00";
-        B <= "00";
-        expected <= "0000";
+        expected <= "1111";
         
     -- testing ASR
     wait for 200 ns;
-        S <= "00010";
+        S <= "0010";
         A <= "10";
         B <= "01";
         expected <= "0011";
@@ -89,15 +88,10 @@ begin
         A <= "11";
         B <= "00";
         expected <= "0011";
-    wait for 100 ns;
-        S <= "00000";
-        A <= "00";
-        B <= "00";
-        expected <= "0000";
     
     -- testing multiplicaiton
     wait for 200 ns;
-        S <= "00100";
+        S <= "0100";
         A <= "00";
         B <= "11";
         expected <= "0000";
@@ -109,15 +103,10 @@ begin
         A <= "11";
         B <= "11";
         expected <= "1001";
-    wait for 100 ns;
-        S <= "00000";
-        A <= "00";
-        B <= "00";
-        expected <= "0000";
-        
+
     -- testing A XOR B
     wait for 200 ns;
-        S <= "01000";
+        S <= "1000";
         A <= "00";
         B <= "00";
         expected <= "0000";
@@ -129,15 +118,10 @@ begin
         A <= "11";
         B <= "10";
         expected <= "0001";
-    wait for 100 ns;
-        S <= "00000";
-        A <= "00";
-        B <= "00";
-        expected <= "0000";
         
     -- testing A > B
     wait for 200 ns;
-        S <= "10000";
+        S <= "0000";
         A <= "00";
         B <= "00";
         expected <= "0000";
@@ -153,11 +137,6 @@ begin
         A <= "11";
         B <= "10";
         expected <= "0001";
-    wait for 100 ns;
-        S <= "00000";
-        A <= "00";
-        B <= "00";
-        expected <= "0000";
     wait;
 end process stim_proc;
 
