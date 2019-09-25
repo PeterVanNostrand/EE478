@@ -1,1 +1,11 @@
+# Visual Studio
 .vscode
+
+# Vivado
+*.cache
+*.ip_user_files
+*.runs
+*.sim
+*.log
+*.jou
+*.str
