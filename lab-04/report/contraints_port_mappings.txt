@@ -1,0 +1,8 @@
+clk : in STD_LOGIC      K17 -- zybo 125 Mhz clock
+start : in STD_LOGIC    K18 -- pushbutton
+
+mclk : out STD_LOGIC    R17 -- ssm2603 MCLK
+bclk : out STD_LOGIC    R19 -- ssm2603 BCLK
+mute : out STD_LOGIC    P18 -- ssm2603 MUTE
+pblrc : out STD_LOGIC   T19 -- ssm2603 PBLRC
+pbdat : out STD_LOGIC   R18 -- ssm2603 PBDAT    
