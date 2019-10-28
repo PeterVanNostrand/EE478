@@ -4,6 +4,7 @@ use IEEE.NUMERIC_STD.ALL;
 use ieee.std_logic_unsigned.all;
 library UNISIM;
 use UNISIM.VComponents.all;
+--use work.EE478.all;
 
 entity Lab5 is
     Port ( sys_clk : in std_logic;
@@ -52,12 +53,19 @@ constant v_max : unsigned(10 downto 0) := to_unsigned(460, 11);
 constant h_min : unsigned(10 downto 0) := to_unsigned(540, 11);
 constant h_max : unsigned(10 downto 0) := to_unsigned(740, 11);
 
+constant h_circ : unsigned(10 downto 0) := to_unsigned(640, 11);
+constant v_circ : unsigned(10 downto 0) := to_unsigned(360, 11);
+
 signal counter : unsigned(26 downto 0) := (others => '0');
 type state_type is (sRED, sGREEN, sBLUE, sYELLOW);
 signal state : state_type := sRED;
 
 constant ONN : std_logic_vector(7 downto 0) := x"FF";
 constant OFF : std_logic_vector(7 downto 0) := x"00";
+
+signal hd : unsigned(10 downto 0) := (others => '0');
+signal vd : unsigned(10 downto 0) := (others => '0');
+constant RADIUS : unsigned(10 downto 0) := to_unsigned(200, 11);
 
 begin
 
@@ -141,7 +149,21 @@ end process;
 
 process(hcount, vcount, state)
 begin
-    if(unsigned(hcount) >= h_min and unsigned(hcount) <= h_max and unsigned(vcount) >= v_min and unsigned(vcount) <= v_max) then
+    -- compute horizontal distance
+    if(unsigned(hcount)>=h_circ) then
+        hd <= unsigned(hcount) - h_circ;
+    else
+        hd <= h_circ - unsigned(hcount);
+    end if;
+    -- comput vertical distance
+    if(unsigned(vcount)>=v_circ) then
+        vd <= unsigned(vcount) - v_circ;
+    else
+        vd <= v_circ - unsigned(vcount);
+    end if;
+
+    if(sqrt((vd*vd)+(hd*hd)) < RADIUS) then
+--    if(unsigned(hcount) >= h_min and unsigned(hcount) <= h_max and unsigned(vcount) >= v_min and unsigned(vcount) <= v_max) then
         case state is
             when sRED =>
                 red_data <= ONN;
@@ -168,4 +190,8 @@ begin
 end process;
      
 end Behavioral;
+
+package REF_PACK is
+
+end REF_PACK;
 
