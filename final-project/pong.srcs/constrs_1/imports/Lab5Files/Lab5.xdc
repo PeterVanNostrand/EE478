@@ -1,3 +1,4 @@
+-- HDMI
 set_property PACKAGE_PIN D19 [get_ports {TMDS[0]}]					
 	set_property IOSTANDARD TMDS_33 [get_ports {TMDS[0]}]
 set_property PACKAGE_PIN D20 [get_ports {TMDSB[0]}]					
@@ -16,6 +17,13 @@ set_property PACKAGE_PIN H17 [get_ports {TMDSB[3]}]
 	set_property IOSTANDARD TMDS_33 [get_ports {TMDSB[3]}]
 set_property PACKAGE_PIN K17 [get_ports {sys_clk}]					
 	set_property IOSTANDARD LVCMOS33 [get_ports {sys_clk}]
-set_property PACKAGE_PIN K18 [get_ports {reset_btn}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {reset_btn}]
 
+-- Pushbuttons from L->R : Y16, K19, P16, K18
+set_property PACKAGE_PIN Y16 [get_ports {p1_up}]
+set_property IOSTANDARD LVCMOS33 [get_ports {p1_up}]
+set_property PACKAGE_PIN K19 [get_ports {p1_dn}]
+set_property IOSTANDARD LVCMOS33 [get_ports {p1_dn}]
+set_property PACKAGE_PIN P16 [get_ports {p2_up}]
+set_property IOSTANDARD LVCMOS33 [get_ports {p2_up}]
+set_property PACKAGE_PIN K18 [get_ports {p2_dn}]
+set_property IOSTANDARD LVCMOS33 [get_ports {p2_dn}]

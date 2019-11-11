@@ -8,8 +8,12 @@ use UNISIM.VComponents.all;
 
 entity pong is
     Port ( sys_clk : in std_logic;
-          reset_btn   : in std_logic;
-          TMDS, TMDSB : out std_logic_vector(3 downto 0));
+          TMDS, TMDSB : out std_logic_vector(3 downto 0);
+          p1_up : in std_logic;
+          p1_dn : in std_logic;
+          p2_up : in std_logic;
+          p2_dn : in std_logic
+          );
 end pong;
 
 architecture Behavioral of pong is
@@ -66,6 +70,9 @@ constant rpad_left : unsigned(10 downto 0) := to_unsigned(1210, 11); -- screen_w
 -- pixel values on and off
 constant ONN : std_logic_vector(7 downto 0) := x"FF";
 constant OFF : std_logic_vector(7 downto 0) := x"00";
+
+signal counter : unsigned(17 downto 0) := (others => '0');
+signal reset_btn : std_logic := '0';
 
 begin
 
@@ -125,6 +132,35 @@ rgb_data <= red_data & blue_data & green_data;
 --To draw shapes, just add conditions based on hcount and vcount.
 --Assign a color to these signals when hcount and vcount are within the shape you want to draw
 --And assign zero otherwise, to paint the rest of the screen black.
+
+process(pclk)
+begin
+    if rising_edge(pclk) then
+        counter <= counter + 1;
+        if(counter = to_unsigned(142788, 18)) then
+            counter <= (others => '0');
+            
+            -- Player one controls
+            if(p1_up='1' and p1_dn='0' and lpad_top>1) then -- move up
+                lpad_top <= lpad_top - 1;
+            elsif(p1_up='0' and p1_dn='1' and (lpad_top+pad_height)<1278) then -- move down
+                lpad_top <= lpad_top + 1;
+            else -- don't move (no input or both buttons)
+                lpad_top <= lpad_top + 0;
+            end if;
+            
+            -- Player two controls
+            if(p2_up='1' and p2_dn='0' and rpad_top>1) then -- move up
+                rpad_top <= rpad_top - 1;
+            elsif(p2_up='0' and p2_dn='1' and (rpad_top+pad_height)<1278) then -- move down
+                rpad_top <= rpad_top + 1;
+            else -- don't move (no input or both buttons)
+                rpad_top <= rpad_top + 0;
+            end if;
+            
+        end if;
+    end if;
+end process;
 
 process(hcount, vcount)
     variable uhcount : unsigned(10 downto 0) := unsigned(hcount);
