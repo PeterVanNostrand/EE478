@@ -74,7 +74,7 @@ begin
 --You may connect the locked output to open - we aren't using it.
 --You may connect the reset input to '0' as in Lab4
 
-pixel_clock_gen : entity work.clk_pll port map (
+pixel_clock_gen : entity work.pxl_clk_gen port map (
     clk_in1 => sys_clk,
     clk_out1 => pclk,
     locked => open,
@@ -135,14 +135,14 @@ begin
         red_data <= ONN;
         green_data <= ONN;
         blue_data <= ONN;
-    end if;
-    -- end left paddle
-    
-    -- right paddle
-    if(uhcount>rpad_left and uhcount<(rpad_left+pad_width) and uvcount>rpad_top and uvcount<(rpad_top+pad_height)) then
+    elsif (uhcount>rpad_left and uhcount<(rpad_left+pad_width) and uvcount>rpad_top and uvcount<(rpad_top+pad_height)) then
         red_data <= ONN;
         green_data <= ONN;
         blue_data <= ONN;
+    else
+        red_data <= OFF;
+        green_data <= OFF;
+        blue_data <= OFF;
     end if;
     -- end right paddle
 end process;
