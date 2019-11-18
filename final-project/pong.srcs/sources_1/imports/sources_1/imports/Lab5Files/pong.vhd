@@ -67,9 +67,20 @@ signal rpad_top : unsigned(10 downto 0) := to_unsigned(400, 11);
 constant rpad_left : unsigned(10 downto 0) := to_unsigned(1210, 11); -- screen_with - indent_left - pad_width
 -- End Paddle coordinates
 
+-- Ball coordinates
+signal ball_x : unsigned(10 downto 0) := to_unsigned(640, 11);
+signal ball_y : unsigned(10 downto 0) := to_unsigned(360, 11);
+signal ball_dx : signed(7 downto 0) := to_signed(1, 8);
+signal ball_dy : signed(7 downto 0) := to_signed(1, 8);
+signal ball_rad : unsigned(7 downto 0) := to_unsigned(10, 8);
+-- End ball coordinates
+
 -- pixel values on and off
 constant ONN : std_logic_vector(7 downto 0) := x"FF";
 constant OFF : std_logic_vector(7 downto 0) := x"00";
+
+constant WHITE : std_logic_vector(23 downto 0) := X"FFFFFF";
+constant BLACK : std_logic_vector(23 downto 0) := X"000000";
 
 signal counter : unsigned(17 downto 0) := (others => '0');
 signal reset_btn : std_logic := '0';
@@ -126,7 +137,7 @@ hdmi_controller : entity work.rgb2dvi
         
         
 active <= not(bgnd_hblnk) and not(bgnd_vblnk); 
-rgb_data <= red_data & blue_data & green_data;	 
+--rgb_data <= red_data & blue_data & green_data;	 
 
 --To simplify the code, I suggest using a combinational process like this, to drive red_data, green_data, and blue_data
 --To draw shapes, just add conditions based on hcount and vcount.
@@ -140,10 +151,52 @@ begin
         if(counter = to_unsigned(142788, 18)) then
             counter <= (others => '0');
             
+            -- Move the ball
+            ball_x <= unsigned(signed(ball_x) + ball_dx);
+            ball_y <= unsigned(signed(ball_y) + ball_dy);
+            
+            -- Bounce the ball
+            if (ball_y-ball_rad)<1 then
+                ball_y <= unsigned(signed(ball_y) - ball_dy);
+                ball_dy <= 0 - ball_dy;
+            elsif (ball_y+ball_rad)>718 then
+                ball_y <= unsigned(signed(ball_y) - ball_dy);
+                ball_dy <= 0 - ball_dy;
+            elsif (ball_x-ball_rad)<(lpad_left+pad_width) and (ball_x-ball_rad)>lpad_left then
+                if (
+                    ((ball_y+ball_rad)>lpad_top and (ball_y+ball_rad)<(lpad_top+pad_height)) or 
+                    ((ball_y-ball_rad)>lpad_top and (ball_y-ball_rad)<(lpad_top+pad_height))
+                   ) then
+                        ball_x <= unsigned(signed(ball_x) - ball_dx);
+                        ball_dx <= 0 - ball_dx;
+                end if;
+            elsif (ball_x+ball_rad)>(rpad_left) and (ball_x+ball_rad)>(rpad_left+pad_width) then
+                if (
+                    ((ball_y+ball_rad)>rpad_top and (ball_y+ball_rad)<(rpad_top+pad_height)) or 
+                    ((ball_y-ball_rad)>rpad_top and (ball_y-ball_rad)<(rpad_top+pad_height))
+                   ) then
+                        ball_x <= unsigned(signed(ball_x) - ball_dx);
+                        ball_dx <= 0 - ball_dx;
+                end if;
+            end if;
+            
+            -- Check for point winning
+            if ball_x<1 then
+                ball_x <= to_unsigned(640, 11);
+                ball_y <= to_unsigned(360, 11);
+                ball_dx <= to_signed(1, 8);
+                ball_dy <= to_signed(1, 8);
+            elsif ball_x>1279 then
+                ball_x <= to_unsigned(640, 11);
+                ball_y <= to_unsigned(360, 11);
+                ball_dx <= to_signed(-1, 8);
+                ball_dy <= to_signed(1, 8);
+            end if;
+            
             -- Player one controls
             if(p1_up='1' and p1_dn='0' and lpad_top>1) then -- move up
                 lpad_top <= lpad_top - 1;
-            elsif(p1_up='0' and p1_dn='1' and (lpad_top+pad_height)<1278) then -- move down
+            elsif(p1_up='0' and p1_dn='1' and (lpad_top+pad_height)<719) then -- move down
                 lpad_top <= lpad_top + 1;
             else -- don't move (no input or both buttons)
                 lpad_top <= lpad_top + 0;
@@ -152,7 +205,7 @@ begin
             -- Player two controls
             if(p2_up='1' and p2_dn='0' and rpad_top>1) then -- move up
                 rpad_top <= rpad_top - 1;
-            elsif(p2_up='0' and p2_dn='1' and (rpad_top+pad_height)<1278) then -- move down
+            elsif(p2_up='0' and p2_dn='1' and (rpad_top+pad_height)<719) then -- move down
                 rpad_top <= rpad_top + 1;
             else -- don't move (no input or both buttons)
                 rpad_top <= rpad_top + 0;
@@ -166,19 +219,27 @@ process(hcount, vcount)
     variable uhcount : unsigned(10 downto 0) := unsigned(hcount);
     variable uvcount : unsigned(10 downto 0) := unsigned(vcount);
 begin
-    -- left paddle
-    if(uhcount>lpad_left and uhcount<(lpad_left+pad_width) and uvcount>lpad_top and uvcount<(lpad_top+pad_height)) then
-        red_data <= ONN;
-        green_data <= ONN;
-        blue_data <= ONN;
+    -- draw paddles and ball
+    if (uhcount>(ball_x-ball_rad) and uhcount<(ball_x+ball_rad) and uvcount>(ball_y-ball_rad) and uvcount<(ball_y+ball_rad)) then
+        rgb_data <= WHITE;
+--        red_data <= ONN;
+--        green_data <= ONN;
+--        blue_data <= ONN
+    elsif(uhcount>lpad_left and uhcount<(lpad_left+pad_width) and uvcount>lpad_top and uvcount<(lpad_top+pad_height)) then
+        rgb_data <= WHITE;
+--        red_data <= ONN;
+--        green_data <= ONN;
+--        blue_data <= ONN;
     elsif (uhcount>rpad_left and uhcount<(rpad_left+pad_width) and uvcount>rpad_top and uvcount<(rpad_top+pad_height)) then
-        red_data <= ONN;
-        green_data <= ONN;
-        blue_data <= ONN;
+        rgb_data <= WHITE;
+--        red_data <= ONN;
+--        green_data <= ONN;
+--        blue_data <= ONN;
     else
-        red_data <= OFF;
-        green_data <= OFF;
-        blue_data <= OFF;
+        rgb_data <= BLACK;
+--        red_data <= OFF;
+--        green_data <= OFF;
+--        blue_data <= OFF;
     end if;
     -- end right paddle
 end process;
