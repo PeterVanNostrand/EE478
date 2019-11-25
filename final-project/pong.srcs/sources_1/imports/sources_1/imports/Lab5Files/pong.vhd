@@ -12,7 +12,9 @@ entity pong is
           p1_up : in std_logic;
           p1_dn : in std_logic;
           p2_up : in std_logic;
-          p2_dn : in std_logic
+          p2_dn : in std_logic;
+          p1_s  : out std_logic_vector(1 downto 0);
+          p2_s  : out std_logic_vector(1 downto 0)
           );
 end pong;
 
@@ -74,6 +76,10 @@ signal ball_dx : signed(7 downto 0) := to_signed(1, 8);
 signal ball_dy : signed(7 downto 0) := to_signed(1, 8);
 signal ball_rad : unsigned(7 downto 0) := to_unsigned(10, 8);
 -- End ball coordinates
+
+-- Scoring
+signal p1_score : unsigned(1 downto 0) := (others => '0');
+signal p2_score : unsigned(1 downto 0) := (others => '0');
 
 -- pixel values on and off
 constant ONN : std_logic_vector(7 downto 0) := x"FF";
@@ -162,21 +168,25 @@ begin
             elsif (ball_y+ball_rad)>718 then
                 ball_y <= unsigned(signed(ball_y) - ball_dy);
                 ball_dy <= 0 - ball_dy;
-            elsif (ball_x-ball_rad)<(lpad_left+pad_width) and (ball_x-ball_rad)>lpad_left then
+            elsif (ball_x-ball_rad)<=(lpad_left+pad_width) and (ball_x-ball_rad)>=lpad_left then
                 if (
                     ((ball_y+ball_rad)>lpad_top and (ball_y+ball_rad)<(lpad_top+pad_height)) or 
                     ((ball_y-ball_rad)>lpad_top and (ball_y-ball_rad)<(lpad_top+pad_height))
                    ) then
-                        ball_x <= unsigned(signed(ball_x) - ball_dx);
-                        ball_dx <= 0 - ball_dx;
+                        if(ball_dx < 0 ) then
+                            ball_x <= unsigned(signed(ball_x) - ball_dx);
+                            ball_dx <= 0 - ball_dx;
+                        end if;
                 end if;
-            elsif (ball_x+ball_rad)>(rpad_left) and (ball_x+ball_rad)<(rpad_left+pad_width) then
+            elsif (ball_x+ball_rad)>=(rpad_left) and (ball_x+ball_rad)<=(rpad_left+pad_width) then
                 if (
                     ((ball_y+ball_rad)>rpad_top and (ball_y+ball_rad)<(rpad_top+pad_height)) or 
                     ((ball_y-ball_rad)>rpad_top and (ball_y-ball_rad)<(rpad_top+pad_height))
                    ) then
-                        ball_x <= unsigned(signed(ball_x) - ball_dx);
-                        ball_dx <= 0 - ball_dx;
+                        if(ball_dx > 0 ) then
+                            ball_x <= unsigned(signed(ball_x) - ball_dx); 
+                            ball_dx <= 0 - ball_dx;
+                        end if;
                 end if;
             end if;
             
@@ -185,12 +195,24 @@ begin
                 ball_x <= to_unsigned(640, 11);
                 ball_y <= to_unsigned(360, 11);
                 ball_dx <= to_signed(1, 8);
-                ball_dy <= to_signed(1, 8);
+                -- Psuedo random vertical direction
+                if unsigned(hcount) < to_unsigned(640, 11) then
+                    ball_dy <= to_signed(1, 8);
+                else
+                    ball_dy <= to_signed(-1, 8);
+                end if;                
+                p2_score <= p2_score + 1;
             elsif ball_x>1279 then
                 ball_x <= to_unsigned(640, 11);
                 ball_y <= to_unsigned(360, 11);
                 ball_dx <= to_signed(-1, 8);
-                ball_dy <= to_signed(1, 8);
+                -- Psuedo random vertical direction
+                if unsigned(hcount) < to_unsigned(640, 11) then
+                    ball_dy <= to_signed(1, 8);
+                else
+                    ball_dy <= to_signed(-1, 8);
+                end if;     
+                p1_score <= p1_score + 1;
             end if;
             
             -- Player one controls
@@ -210,6 +232,9 @@ begin
             else -- don't move (no input or both buttons)
                 rpad_top <= rpad_top + 0;
             end if;
+            
+            p1_s <= std_logic_vector(p1_score);
+            p2_s <= std_logic_vector(p2_score);
             
         end if;
     end if;

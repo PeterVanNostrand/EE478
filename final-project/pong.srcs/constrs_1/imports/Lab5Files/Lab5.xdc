@@ -27,3 +27,13 @@ set_property PACKAGE_PIN P16 [get_ports {p2_up}]
 set_property IOSTANDARD LVCMOS33 [get_ports {p2_up}]
 set_property PACKAGE_PIN K18 [get_ports {p2_dn}]
 set_property IOSTANDARD LVCMOS33 [get_ports {p2_dn}]
+
+-- LEDs
+set_property PACKAGE_PIN D18 [get_ports {p1_s[1]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {p1_s[1]}]
+set_property PACKAGE_PIN G14 [get_ports {p1_s[0]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {p1_s[0]}]
+set_property PACKAGE_PIN M15 [get_ports {p2_s[1]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {p2_s[1]}]
+set_property PACKAGE_PIN M14 [get_ports {p2_s[0]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {p2_s[0]}]
