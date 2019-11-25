@@ -170,7 +170,7 @@ begin
                         ball_x <= unsigned(signed(ball_x) - ball_dx);
                         ball_dx <= 0 - ball_dx;
                 end if;
-            elsif (ball_x+ball_rad)>(rpad_left) and (ball_x+ball_rad)>(rpad_left+pad_width) then
+            elsif (ball_x+ball_rad)>(rpad_left) and (ball_x+ball_rad)<(rpad_left+pad_width) then
                 if (
                     ((ball_y+ball_rad)>rpad_top and (ball_y+ball_rad)<(rpad_top+pad_height)) or 
                     ((ball_y-ball_rad)>rpad_top and (ball_y-ball_rad)<(rpad_top+pad_height))
