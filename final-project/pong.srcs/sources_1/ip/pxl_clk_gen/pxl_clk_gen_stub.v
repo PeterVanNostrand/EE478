@@ -1,10 +1,10 @@
 // Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2019.1 (win64) Build 2552052 Fri May 24 14:49:42 MDT 2019
-// Date        : Mon Nov 11 10:07:23 2019
-// Host        : VanNostrandSBW running 64-bit major release  (build 9200)
+// Date        : Wed Dec  4 13:55:43 2019
+// Host        : Move-Me running 64-bit major release  (build 9200)
 // Command     : write_verilog -force -mode synth_stub
-//               c:/Users/peter/Documents/Peter/7-College/7-Fall-2019/EE478/GitHub-Repo/final-project/pong.srcs/sources_1/ip/pxl_clk_gen/pxl_clk_gen_stub.v
+//               C:/Users/GV/Desktop/EE478/GitHub/EE478/final-project/pong.srcs/sources_1/ip/pxl_clk_gen/pxl_clk_gen_stub.v
 // Design      : pxl_clk_gen
 // Purpose     : Stub declaration of top-level module interface
 // Device      : xc7z010clg400-1

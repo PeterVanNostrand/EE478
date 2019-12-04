@@ -13,6 +13,9 @@ entity pong is
           p1_dn : in std_logic;
           p2_up : in std_logic;
           p2_dn : in std_logic;
+          Speed : in std_logic;
+          Shrink: in std_logic;
+          Circle: in std_logic;
           p1_s  : out std_logic_vector(1 downto 0);
           p2_s  : out std_logic_vector(1 downto 0)
           );
@@ -60,12 +63,14 @@ constant h_max : unsigned(10 downto 0) := to_unsigned(740, 11);
 
 -- Paddle coordinates
 constant pad_width : unsigned(10 downto 0) := to_unsigned(20, 11);
-constant pad_height : unsigned(10 downto 0) := to_unsigned(200, 11);
+signal r_pad_height : unsigned(10 downto 0) := to_unsigned(200, 11);
+signal l_pad_height : unsigned(10 downto 0) := to_unsigned(200, 11);
+constant shrink_inc : unsigned(10 downto 0) := to_unsigned(25, 11);
 
-signal lpad_top : unsigned(10 downto 0) := to_unsigned(200, 11);
+signal lpad_top : unsigned(10 downto 0) := to_unsigned(300, 11);
 constant lpad_left : unsigned(10 downto 0) := to_unsigned(50, 11);
 
-signal rpad_top : unsigned(10 downto 0) := to_unsigned(400, 11);
+signal rpad_top : unsigned(10 downto 0) := to_unsigned(300, 11);
 constant rpad_left : unsigned(10 downto 0) := to_unsigned(1210, 11); -- screen_with - indent_left - pad_width
 -- End Paddle coordinates
 
@@ -90,6 +95,8 @@ constant BLACK : std_logic_vector(23 downto 0) := X"000000";
 
 signal counter : unsigned(17 downto 0) := (others => '0');
 signal reset_btn : std_logic := '0';
+signal max_count: unsigned(17 downto 0) := to_unsigned(142788, 18);
+
 
 begin
 
@@ -149,43 +156,77 @@ active <= not(bgnd_hblnk) and not(bgnd_vblnk);
 --To draw shapes, just add conditions based on hcount and vcount.
 --Assign a color to these signals when hcount and vcount are within the shape you want to draw
 --And assign zero otherwise, to paint the rest of the screen black.
+process(speed,ball_dy)
+begin
+   if speed = '1' then
+        if ball_dy = to_signed(1, 8) or ball_dy = to_signed(-1, 8) then
+            max_count <= to_unsigned(100966, 18);
+        elsif ball_dy = to_signed(2, 8) or ball_dy = to_signed(-2, 8) then
+            max_count <= to_unsigned(159641, 18);
+        else max_count <= to_unsigned(71394, 18);
+        end if;        
+   elsif speed = '0' then 
+        if ball_dy = to_signed(1, 8) or ball_dy = to_signed(-1, 8) then
+            max_count <= to_unsigned(142788, 18);
+        elsif ball_dy = to_signed(2, 8) or ball_dy = to_signed(-2, 8) then
+            max_count <= to_unsigned(225767, 18);
+        else max_count <= to_unsigned(100966, 18);
+        end if;
+   end if;
+end process;
 
 process(pclk)
 begin
     if rising_edge(pclk) then
         counter <= counter + 1;
-        if(counter = to_unsigned(142788, 18)) then
+        if(counter = max_count) then
             counter <= (others => '0');
             
             -- Move the ball
             ball_x <= unsigned(signed(ball_x) + ball_dx);
             ball_y <= unsigned(signed(ball_y) + ball_dy);
-            
+
             -- Bounce the ball
-            if (ball_y-ball_rad)<1 then
+            if (ball_y-ball_rad) < 2 then
                 ball_y <= unsigned(signed(ball_y) - ball_dy);
                 ball_dy <= 0 - ball_dy;
-            elsif (ball_y+ball_rad)>718 then
+            elsif (ball_y+ball_rad)> 717 then
                 ball_y <= unsigned(signed(ball_y) - ball_dy);
                 ball_dy <= 0 - ball_dy;
             elsif (ball_x-ball_rad)<=(lpad_left+pad_width) and (ball_x-ball_rad)>=lpad_left then
                 if (
-                    ((ball_y+ball_rad)>lpad_top and (ball_y+ball_rad)<(lpad_top+pad_height)) or 
-                    ((ball_y-ball_rad)>lpad_top and (ball_y-ball_rad)<(lpad_top+pad_height))
+                    ((ball_y+ball_rad)>lpad_top and (ball_y+ball_rad)<(lpad_top+l_pad_height)) or 
+                    ((ball_y-ball_rad)>lpad_top and (ball_y-ball_rad)<(lpad_top+l_pad_height))
                    ) then
                         if(ball_dx < 0 ) then
                             ball_x <= unsigned(signed(ball_x) - ball_dx);
                             ball_dx <= 0 - ball_dx;
+                                if (ball_dy < 2 and p1_up='0' and p1_dn='1' and (lpad_top+l_pad_height)<719) then 
+                                    ball_dy <= ball_dy + 1;
+                                elsif (ball_dy > -2 and p1_up='1' and p1_dn='0' and lpad_top>1) then 
+                                    ball_dy <= ball_dy - 1;
+                                end if;
+                        end if;
+                        if(Shrink = '1' and l_pad_height > 0) then
+                            l_pad_height <= l_pad_height - shrink_inc;
                         end if;
                 end if;
             elsif (ball_x+ball_rad)>=(rpad_left) and (ball_x+ball_rad)<=(rpad_left+pad_width) then
                 if (
-                    ((ball_y+ball_rad)>rpad_top and (ball_y+ball_rad)<(rpad_top+pad_height)) or 
-                    ((ball_y-ball_rad)>rpad_top and (ball_y-ball_rad)<(rpad_top+pad_height))
+                    ((ball_y+ball_rad)>rpad_top and (ball_y+ball_rad)<(rpad_top+r_pad_height)) or 
+                    ((ball_y-ball_rad)>rpad_top and (ball_y-ball_rad)<(rpad_top+r_pad_height))
                    ) then
                         if(ball_dx > 0 ) then
                             ball_x <= unsigned(signed(ball_x) - ball_dx); 
                             ball_dx <= 0 - ball_dx;
+                                if (ball_dy < 2 and p2_up='0' and p2_dn='1' and (rpad_top+r_pad_height)<719) then 
+                                    ball_dy <= ball_dy + 1;
+                                elsif (ball_dy > -2 and p2_up='1' and p2_dn='0' and rpad_top > 1) then 
+                                    ball_dy <= ball_dy - 1;
+                                end if;
+                                if(Shrink = '1' and r_pad_height > 0) then
+                                    r_pad_height <= r_pad_height - shrink_inc;
+                                    end if;
                         end if;
                 end if;
             end if;
@@ -195,6 +236,9 @@ begin
                 ball_x <= to_unsigned(640, 11);
                 ball_y <= to_unsigned(360, 11);
                 ball_dx <= to_signed(1, 8);
+                r_pad_height <= to_unsigned(200, 11);
+                l_pad_height <= to_unsigned(200, 11);
+                
                 -- Psuedo random vertical direction
                 if unsigned(hcount) < to_unsigned(640, 11) then
                     ball_dy <= to_signed(1, 8);
@@ -206,6 +250,8 @@ begin
                 ball_x <= to_unsigned(640, 11);
                 ball_y <= to_unsigned(360, 11);
                 ball_dx <= to_signed(-1, 8);
+                r_pad_height <= to_unsigned(200, 11);
+                l_pad_height <= to_unsigned(200, 11);
                 -- Psuedo random vertical direction
                 if unsigned(hcount) < to_unsigned(640, 11) then
                     ball_dy <= to_signed(1, 8);
@@ -218,7 +264,7 @@ begin
             -- Player one controls
             if(p1_up='1' and p1_dn='0' and lpad_top>1) then -- move up
                 lpad_top <= lpad_top - 1;
-            elsif(p1_up='0' and p1_dn='1' and (lpad_top+pad_height)<719) then -- move down
+            elsif(p1_up='0' and p1_dn='1' and (lpad_top+l_pad_height)<719) then -- move down
                 lpad_top <= lpad_top + 1;
             else -- don't move (no input or both buttons)
                 lpad_top <= lpad_top + 0;
@@ -227,7 +273,7 @@ begin
             -- Player two controls
             if(p2_up='1' and p2_dn='0' and rpad_top>1) then -- move up
                 rpad_top <= rpad_top - 1;
-            elsif(p2_up='0' and p2_dn='1' and (rpad_top+pad_height)<719) then -- move down
+            elsif(p2_up='0' and p2_dn='1' and (rpad_top+r_pad_height)<719) then -- move down
                 rpad_top <= rpad_top + 1;
             else -- don't move (no input or both buttons)
                 rpad_top <= rpad_top + 0;
@@ -245,17 +291,19 @@ process(hcount, vcount)
     variable uvcount : unsigned(10 downto 0) := unsigned(vcount);
 begin
     -- draw paddles and ball
-    if (uhcount>(ball_x-ball_rad) and uhcount<(ball_x+ball_rad) and uvcount>(ball_y-ball_rad) and uvcount<(ball_y+ball_rad)) then
+    if (uhcount>(ball_x-ball_rad) and uhcount<(ball_x+ball_rad) and uvcount>(ball_y-ball_rad) and uvcount<(ball_y+ball_rad) and Circle = '0') then
         rgb_data <= WHITE;
 --        red_data <= ONN;
 --        green_data <= ONN;
 --        blue_data <= ONN
-    elsif(uhcount>lpad_left and uhcount<(lpad_left+pad_width) and uvcount>lpad_top and uvcount<(lpad_top+pad_height)) then
+    elsif ((uhcount - ball_x) * (uhcount - ball_x) + (uvcount - ball_y) * (uvcount - ball_y) < (ball_rad * ball_rad) and Circle = '1') then
+        rgb_data <= WHITE;
+    elsif(uhcount>lpad_left and uhcount<(lpad_left+pad_width) and uvcount>lpad_top and uvcount<(lpad_top+l_pad_height)) then
         rgb_data <= WHITE;
 --        red_data <= ONN;
 --        green_data <= ONN;
 --        blue_data <= ONN;
-    elsif (uhcount>rpad_left and uhcount<(rpad_left+pad_width) and uvcount>rpad_top and uvcount<(rpad_top+pad_height)) then
+    elsif (uhcount>rpad_left and uhcount<(rpad_left+pad_width) and uvcount>rpad_top and uvcount<(rpad_top+r_pad_height)) then
         rgb_data <= WHITE;
 --        red_data <= ONN;
 --        green_data <= ONN;

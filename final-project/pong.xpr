@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="40" Path="C:/Users/peter/Documents/Peter/7-College/7-Fall-2019/EE478/GitHub-Repo/final-project/pong.xpr">
+<Project Version="7" Minor="40" Path="C:/Users/GV/Desktop/EE478/GitHub/EE478/final-project/pong.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="9b1d9cb954ed4db5852cfa5ab35c14f5"/>
@@ -131,15 +131,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PSRCDIR/sources_1/imports/sources_1/imports/Lab5Files/Lab5.vhd">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="ImportPath" Val="$PPRDIR/../lab-05/lab-05.srcs/sources_1/imports/Lab5Files/Lab5.vhd"/>
-          <Attr Name="ImportTime" Val="1572275109"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PSRCDIR/sources_1/imports/sources_1/new/EE478.vhd">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
@@ -244,12 +235,11 @@
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2019"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="pixel_clock_gen_synth_1" Type="Ft3:Synth" SrcSet="pixel_clock_gen" Part="xc7z010clg400-1" ConstrsSet="pixel_clock_gen" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/pixel_clock_gen_synth_1" IncludeInArchive="true">
+    <Run Id="pixel_clock_gen_synth_1" Type="Ft3:Synth" SrcSet="pixel_clock_gen" Part="xc7z010clg400-1" ConstrsSet="pixel_clock_gen" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2019"/>
         <Step Id="synth_design"/>
       </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2019"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
