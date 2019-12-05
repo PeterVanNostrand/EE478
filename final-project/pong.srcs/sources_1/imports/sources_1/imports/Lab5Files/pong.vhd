@@ -207,7 +207,7 @@ begin
                                     ball_dy <= ball_dy - 1;
                                 end if;
                         end if;
-                        if(Shrink = '1' and l_pad_height > 0) then
+                        if(Shrink = '1' and l_pad_height > shrink_inc) then
                             l_pad_height <= l_pad_height - shrink_inc;
                         end if;
                 end if;
@@ -224,7 +224,7 @@ begin
                                 elsif (ball_dy > -2 and p2_up='1' and p2_dn='0' and rpad_top > 1) then 
                                     ball_dy <= ball_dy - 1;
                                 end if;
-                                if(Shrink = '1' and r_pad_height > 0) then
+                                if(Shrink = '1' and r_pad_height > shrink_inc) then
                                     r_pad_height <= r_pad_height - shrink_inc;
                                     end if;
                         end if;
@@ -296,7 +296,13 @@ begin
 --        red_data <= ONN;
 --        green_data <= ONN;
 --        blue_data <= ONN
-    elsif ((uhcount - ball_x) * (uhcount - ball_x) + (uvcount - ball_y) * (uvcount - ball_y) < (ball_rad * ball_rad) and Circle = '1') then
+    elsif ((uhcount>=ball_x) and (uvcount>=ball_y) and (uhcount - ball_x) * (uhcount - ball_x) + (uvcount - ball_y) * (uvcount - ball_y) < (ball_rad * ball_rad) and Circle = '1') then
+        rgb_data <= WHITE;
+    elsif ((uhcount<ball_x) and (uvcount>=ball_y) and (ball_x - uhcount) * (ball_x - uhcount) + (uvcount - ball_y) * (uvcount - ball_y) < (ball_rad * ball_rad) and Circle = '1') then
+        rgb_data <= WHITE;
+    elsif ((uhcount>=ball_x) and (uvcount<ball_y) and (uhcount - ball_x) * (uhcount - ball_x) + (ball_y - uvcount) * (ball_y - uvcount) < (ball_rad * ball_rad) and Circle = '1') then
+        rgb_data <= WHITE;
+    elsif ((uhcount<ball_x) and (uvcount<ball_y) and (ball_x - uhcount) * (ball_x - uhcount) + (ball_y - uvcount) * (ball_y - uvcount) < (ball_rad * ball_rad) and Circle = '1') then
         rgb_data <= WHITE;
     elsif(uhcount>lpad_left and uhcount<(lpad_left+pad_width) and uvcount>lpad_top and uvcount<(lpad_top+l_pad_height)) then
         rgb_data <= WHITE;
